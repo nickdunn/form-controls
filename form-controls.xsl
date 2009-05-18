@@ -8,13 +8,10 @@
 
 <!--
 Name: Form Controls
-Description: A suite of templates to build robust form control elements attached to Symphony events
-Version: 0.3
-Author: Nick Dunn <nick@nick-dunn.co.uk>
-URL: http://symphony21.com/downloads/xslt/file/.../
-
-Todo:
-* add support for optgroups in selects
+Description: An XSLT utility to create powerful HTML forms with Symphony
+Version: 1.0
+Author: Nick Dunn <http://github.com/nickdunn>
+URL: http://github.com/nickdunn/form-controls/tree/master
 -->
 
 <!-- Class valid added to invalid form controls -->
@@ -22,36 +19,21 @@ Todo:
 
 <!--
 Name: validation-summary
-Description: provides a summary of validation errors from an event
+Description: Renders a success/error message and list of invalid fields
 Returns: HTML
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* header (optional, string) custom error message at the top of the summary. Defaults to Symphony's default event message
-
-* section (optional, string) only show validation errors for a named section. With or without an index-key e.g.
-	'blog-articles' or 'comments[2]'
-	
-* errors (optional, string) list of nodes providing custom error messages to override specific field messages e.g.
-	
-	<error field="title">Please enter a title</error>
-	any error on the title field (missing or invalid)
-	
-	<error field="title" type="missing,invalid">Please enter a title</error>
-	any error on the title field (missing or invalid)
-	
-	<error field="email" type="missing">Please enter an e-mail address</error>
-	when email is missing
-	
-	<error field="email" type="invalid">Please enter a valid e-mail address</error> 
-	when email is invalid
-	
+* `error-message` (optional, string/XPath): Error notification message. Defaults to Symphony Event message
+* `success-message` (optional, string/XPath): Success notification message. Defaults to Symphony Event message
+* `erorrs` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony Event defaults
+* `section` (optional, string): Use with EventEx to show errors for a specific section handle only
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:validation-summary">
-	<xsl:param name="event" select="$form:event"/>
-	<xsl:param name="section" select="'fields'"/>
-	<xsl:param name="header" select="$event/message"/>
-	<xsl:param name="success" select="$event/message"/>
+	<xsl:param name="error-message" select="$event/message"/>
+	<xsl:param name="success-message" select="$event/message"/>
 	<xsl:param name="errors"/>
+	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
@@ -84,7 +66,7 @@ Parameters:
 			
 			<div class="validation-summary error">
 
-				<p><xsl:value-of select="$header"/></p>
+				<p><xsl:value-of select="$error-message"/></p>
 
 				<ul>
 					<xsl:for-each select="exsl:node-set($event-result)//*[not(name()='entry') and @type]">
@@ -117,11 +99,11 @@ Parameters:
 									</xsl:when>
 
 									<!-- invalid and a section specified-->
-									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[handle=name(current()) and contains(@type,'invalid') and @section = current()/parent::entry/@section-handle]">
+									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section = current()/parent::entry/@section-handle]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section = current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- invalid -->
-									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[handle=name(current()) and contains(@type,'invalid')]">
+									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]"/>
 									</xsl:when>
 
@@ -155,7 +137,7 @@ Parameters:
 		<xsl:when test="exsl:node-set($event-result)//*[@result='success']">
 		
 			<div class="validation-summary success">
-				<p><xsl:value-of select="$success"/></p>
+				<p><xsl:value-of select="$success-message"/></p>
 			</div>
 			
 		</xsl:when>
@@ -164,17 +146,17 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: label
-Description: builds an HTML label element
+Name: form:label
+Description: Renders an HTML `label` element that can be explicitly assigned to another form element. Can be wrapped around other controls.
 Returns: HTML <label> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* for (mandatory, string) handle of a Symphony field name that this label is associated with
-* text (optional, string) text value of the label. Defaults to field name ($for value)
-* section (optional, string) custom key section
-* child (XML, string) places this XML inside the label, for wrapping elements with the label
-* child-position (optional, string) place the child before or after the label text. Defaults to "after"
-* class (optional, string) value of the HTML @class attribute
+* `for` (optional, string): Handle of a Symphony field name that this label is associated with
+* `text` (optional, string): Text value of the label. Defaults to field name ($for value)
+* `child` (optional, XML): Places this XML inside the label, for wrapping elements with the label
+* `child-position` (optional, string): Place the child before or after the label text. Defaults to "after"
+* `class` (optional, string): Value of the HTML @class attribute
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:label">
 	<xsl:param name="for"/>
@@ -227,17 +209,19 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: checkbox
-Description: builds an HTML checkbox element
+Name: form:checkbox
+Description: Renders an HTML checkbox `input` element
 Returns: HTML <input> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section
-* checked (optional, string) existing value to pre-check the checkbox ("yes|no")
-* checked-by-default (optional, string) when no existing $checked value, should this checkbox be selected? Defaults to "no"
-* class (optional, string) value of the HTML @class attribute
-* title	(optional, string) value of the HTML @title attribute
+* `handle` (mandatory, string): Handle of the field name
+* `checked` (optional, string): Initial checked state ("yes", "no"). Defaults to "no"
+* `checked-by-default` (optional, string): When there is no initial $checked value (a fresh form), check by default ("yes", "no"). Defaults to "no"
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
+* `allow-multiple` (optional, string): Internal use only ("yes", "no"). Whether checkbox is part of a checkbox list. Defaults to "no"
+* `allow-multiple-value` (optional, string): Internal use only. Overrides default "yes" value when part of a checkbox list
 -->
 <xsl:template name="form:checkbox">
 	<xsl:param name="handle"/>
@@ -290,19 +274,20 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: radio
-Description: builds an HTML radio element
+Name: form:radio
+Description: Renders an HTML radio `input` element
 Returns: HTML <input> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section
-* value	(optional, string) the selected value of this radio button
-* existing-value (optional, string) existing value to pre-check a radio button
-* checked-by-default (optional, string) when no $existing-value, should this radio button be selected? Defaults to "no"
-* class (optional, string) value of the HTML @class attribute
-* title (optional, string) value of the HTML @title attribute
-* type (optional, string) internal use ("radio|checkbox"). Defaults to "radio"
+* `handle` (mandatory, string): Handle of the field name
+* `value` (optional, string): The selected value for this radio sent when the form is submitted
+* `existing-value` (optional, string): An initial value. Selects radio if it matches $value
+* `checked-by-default` (optional, string): When there is no initial $existing-value (a fresh form), select by default ("yes", "no"). Defaults to "no"
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `type` (optional, string): Internal use only ("radio", "checkbox"). Defaults to "radio"
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
+* `allow-multiple` (optional, string): Internal use only ("yes", "no"). Whether control is part of a radio/checkbox list. Defaults to "no"
 -->
 <xsl:template name="form:radio">
 	<xsl:param name="handle"/>
@@ -393,20 +378,20 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: input
-Description: builds an HTML input element
+Name: form:input
+Description: Renders an HTML text `input` element with support for `password` and `file` types
 Returns: HTML <input> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section
-* value (optional, string) value of the HTML @value attribute
-* class (optional, string) value of the HTML @class attribute
-* title (optional, string) value of the HTML @title attribute
-* type (optional, string) value of the HTML @type attribute. Defaults to "text". Alternatives could be "file" and "password"
-* size (optional, string) value of the HTML @size attribute
-* maxlength (optional, string) value of the HTML @maxlength attribute
-* autocomplete (optional, string) value of the HTML @autocomplete attribute (e.g. "off")
+* `handle` (mandatory, string): Handle of the field name
+* `value` (optional, string): Initial value of form control. Will not work for `file` inputs.
+* `type` (optional, string): Type attribute value ("text", "password" "file"). Defaults to "text"
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `size` (optional, string): Size attribute value
+* `maxlength` (optional, string): Maxlength attribute value
+* `autocomplete` (optional, string): Autocomplete attribute value ("off"). Not set by default
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:input">
 	<xsl:param name="handle"/>
@@ -462,18 +447,17 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: textarea
-Description: builds an HTML textarea element
+Name: form:textarea
+Description: Renders an HTML `textarea` element
 Returns: HTML <textarea> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section
-* value (optional, string) value of the HTML @value attribute
-* class (optional, string) value of the HTML @class attribute
-* title (optional, string) value of the HTML @title attribute
-* rows (optional, string) value of the HTML @rows attribute
-* cols (optional, string) value of the HTML @cols attribute	
+* `handle` (mandatory, string): Handle of the field name
+* `value` (optional, string): Contents of the textarea
+* `class` (optional, string): Class attribute value
+* `rows` (optional, string): Rows attribute value
+* `cols` (optional, string): cols attribute value
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:textarea">
 	<xsl:param name="handle"/>
@@ -482,8 +466,8 @@ Parameters:
 	<xsl:param name="title"/>
 	<xsl:param name="rows"/>
 	<xsl:param name="cols"/>
-	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="initial-value" select="normalize-space($value)"/>
 	
@@ -519,68 +503,28 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: select
-Description: builds an HTML select element
+Name: form:select
+Description: Renders an HTML `select` element
 Returns: HTML <select> element
 Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section
-* value (optional, string) value of the HTML @value attribute
-* class (optional, string) value of the HTML @class attribute
-* title (optional, string) value of the HTML @title attribute
-* options (mandatory, string/Xpath/XML) options to build a list of <option> elements. Has presets! e.g.
-	
-	String:	'days'
-			returns a list of 31 days, for building a series of date selects
-			e.g. <option>1</option> ... <option>31</option>
-		
-	String:	'months'
-			returns a list of 12 months
-			e.g. <option value="01">January</option> ... <option value="12">December</option>
-		
-	String:	'years+10' ('years+N')
-			returns a list of years between this year and 10 years from now
-			e.g. <option>2009</option> ... <option>2019</option>
-	
-	String:	'years-3' ('years-N')
-			returns a list of years between this year and 3 years in the past
-			e.g. <option>2009</option> ... <option>2006</option>
-	
-	In addition to present strings, $options can be a node-set (xsl:copy-of) or static XML.
-	If the option has one of the following attributes, they will be used as the @value in the HTML (in this order of preference)
-		@handle, @id, @link-id, @link-handle, @value
-	
-	Therefore acceptable with-param examples can be in the form:
-	
-		<xsl:with-param name="options" select="'days'"/> (return a list of 31 days)
-		
-		<xsl:with-param name="options" select="/data/datasource/entry/tags/item"/> (build a list of tags)
-		
-		<xsl:with-param name="options">
-			<item handle="hello">Hello</item>
-			<item handle="world">World</item>
-		</xsl:with-param>
-	
-		<xsl:with-param name="options">
-			<option>Hello</option>
-			<option>World</option>
-		</xsl:with-param>
-		
-		<xsl:with-param name="options">
-			<option value="">Please select a tag:</option>
-			<xsl:copy-of select="/data/datasource/entry/tags/item"/>
-		</xsl:with-param>	
+* `handle` (mandatory, string): Handle of the field name
+* `options` (mandatory, XPath/XML): Options to build a list of <option> elements. Has presets! See examples.
+* `value` (optional, string/XML): Initial selected value
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `allow-multiple` (optional, string): Allow selection of multiple options ("yes", "no"). Defaults to "no"
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:select">
-	<xsl:param name="event" select="$form:event"/>
-	<xsl:param name="handle"/>
-	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="handle"/>	
 	<xsl:param name="value"/>
 	<xsl:param name="class"/>
 	<xsl:param name="title"/>
 	<xsl:param name="options"/>
 	<xsl:param name="allow-multiple"/>
+	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="event" select="$form:event"/>
 
 	<xsl:variable name="initial-value">
 		<xsl:choose>
@@ -710,14 +654,27 @@ Parameters:
 
 </xsl:template>
 
+<!--
+Name: form:radiobutton-list
+Description: Renders a collection of HTML radio `input` elements wrapped with `label` elements
+Returns: HTML <select> element
+Parameters:
+* `handle` (mandatory, string): Handle of the field name
+* `options` (mandatory, XPath/XML): Options to build a list of <option> elements. Has presets! See examples.
+* `value` (optional, string): Initial selected value
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
+-->
 <xsl:template name="form:radiobutton-list">
-	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="handle"/>
-	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="value"/>
 	<xsl:param name="class"/>
 	<xsl:param name="title"/>
 	<xsl:param name="options"/>
+	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="select">
 		<xsl:call-template name="form:select">
@@ -758,14 +715,27 @@ Parameters:
 	
 </xsl:template>
 
+<!--
+Name: form:checkbox-list
+Description: Renders a collection of HTML checkbox `input` elements wrapped with `label` elements
+Returns: HTML <select> element
+Parameters:
+* `handle` (mandatory, string): Handle of the field name
+* `options` (mandatory, XPath/XML): Options to build a list of <option> elements. Has presets! See examples.
+* `value` (optional, string/XML): Initial selected value
+* `class` (optional, string): Class attribute value
+* `title` (optional, string): Title attribute value
+* `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
+-->
 <xsl:template name="form:checkbox-list">
-	<xsl:param name="event" select="$form:event"/>
-	<xsl:param name="handle"/>
-	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="handle"/>	
 	<xsl:param name="value"/>
 	<xsl:param name="class"/>
 	<xsl:param name="title"/>
 	<xsl:param name="options"/>
+	<xsl:param name="section" select="'fields'"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="select">
 		<xsl:call-template name="form:select">
@@ -864,17 +834,14 @@ Parameters:
 </xsl:attribute-set>
 
 <!--
-Name: control-is-valid
+Name: form:control-is-valid
 Description: returns whether a field is valid or not
 Returns: boolean (string "true|false")
-Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
 -->
 <xsl:template name="form:control-is-valid">
-	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="handle"/>
 	<xsl:param name="section"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
@@ -911,12 +878,9 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: control-name
+Name: form:control-name
 Description: returns a keyed field name for use in HTML @name attributes
 Returns: string
-Parameters:
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section. Defaults to "fields" (the Symphony default)
 -->
 <xsl:template name="form:control-name">
 	<xsl:param name="handle"/>
@@ -937,11 +901,9 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: control-id
+Name: form:control-id
 Description: returns a sanitised version of a field's @name for use as a unique @id attribute
 Returns: string
-Parameters:
-* name (mandatory, string) form field's @name attribute e.g. "fields[title]"
 -->
 <xsl:template name="form:control-id">
 	<xsl:param name="name"/>
@@ -950,18 +912,14 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: postback-value
+Name: form:postback-value
 Description: determines the postback value of a control if an Event has been triggered
 Returns: string
-Parameters:
-* event (mandatory, XPath) XPath expression to the specific event within the page <events> node
-* handle (mandatory, string) handle of a Symphony field name
-* section (optional, string) custom key section. Defaults to "fields" (the Symphony default)
 -->
 <xsl:template name="form:postback-value">
-	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="handle"/>
 	<xsl:param name="section"/>
+	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
@@ -991,13 +949,9 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: section-handle
+Name: form:section-handle
 Description: increases or decreases a number between two bounds
 Returns: a nodeset of <option> elements
-Parameters:
-* start (mandatory, string) start number
-* iterations (mandatory, string) number of iterations
-* direction (optional, string) direction of increment. Defaults to "+"
 -->
 <xsl:template name="form:section-handle">
 	<xsl:param name="section"/>
@@ -1012,7 +966,11 @@ Parameters:
 	</xsl:choose>
 </xsl:template>
 
-<!-- TODO: document -->
+<!--
+Name: form:section-index-key
+Description: returns the index from a section handle
+Returns: string
+-->
 <xsl:template name="form:section-index-key">
 	<xsl:param name="section"/>
 	
@@ -1022,13 +980,9 @@ Parameters:
 </xsl:template>
 
 <!--
-Name: incrementor
+Name: form:incrementor
 Description: increases or decreases a number between two bounds
 Returns: a nodeset of <option> elements
-Parameters:
-* start (mandatory, string) start number
-* iterations (mandatory, string) number of iterations
-* direction (optional, string) direction of increment. Defaults to "+"
 -->
 <xsl:template name="form:incrementor">
 	<xsl:param name="start" select="$start"/>
