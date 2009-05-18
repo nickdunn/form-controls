@@ -141,7 +141,6 @@ Renders an HTML `label` element that can be explicitly assigned to another form 
 		<xsl:with-param name="for" select="'title'"/>
 	</xsl:call-template>
 
-
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'title'"/>
 		<xsl:with-param name="text" select="'Post Title'"/>
@@ -218,7 +217,7 @@ Renders an HTML checkbox `input` element. If a checkbox is not checked, its valu
 * `allow-multiple-value` (optional, string): Internal use only. Overrides default "yes" value when part of a checkbox list
 
 #### Example
-	
+
 	<!-- renders a checkbox (ticked), inside a label with the label text following the checkbox -->
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'published'"/>
