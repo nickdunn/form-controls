@@ -608,7 +608,7 @@ Parameters:
 				<xsl:otherwise>
 					<xsl:for-each select="exsl:node-set($options)/* | exsl:node-set($options)">
 						<xsl:if test="text()!=''">
-							<option>a
+							<option>
 								<xsl:if test="@handle or @id or @link-id or @link-handle or @value">
 									<xsl:attribute name="value">
 										<xsl:value-of select="@handle | @id | @link-id | @link-handle | @value"/>
