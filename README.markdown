@@ -397,10 +397,10 @@ Renders a success/error message and list of invalid fields.
 		<xsl:with-param name="success-message" select="'The entry was saved.'"/>
 		<xsl:with-param name="error-message" select="'The entry was not saved because of the following errors:'"/>
 		<xsl:with-param name="errors">
-			<error hande="title">Post Title contained an error</error>
-			<error hande="email-address" type="missing">Please enter your e-mail address</error>
-			<error hande="email-address" type="invalid">Please enter a valid e-mail address</error>
-			<error hande="content" type="missing,invalid">Post Content is missing or invalid</error>
+			<error handle="title">Post Title contained an error</error>
+			<error handle="email-address" type="missing">Please enter your e-mail address</error>
+			<error handle="email-address" type="invalid">Please enter a valid e-mail address</error>
+			<error handle="content" type="missing,invalid">Post Content is missing or invalid</error>
 		</xsl:with-param>
 	</xsl:call-template>
 
