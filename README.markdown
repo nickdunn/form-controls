@@ -9,7 +9,7 @@ Form Controls provides the following functionality:
 * templates to render all common HTML form control elements
 * pre-populate controls with static or dynamic data
 * persist posted values from Events
-* associate and optionally wrap labels
+* associate and optionally wrap with labels
 * provides HTML hooks when field is invalid (class attribute)
 * provides powerful validation messages and error response
 
@@ -24,7 +24,7 @@ On the page in which you are building the form, import the XSL file:
 
 	<xsl:import href="../utilities/form-controls.xsl"/>
 
-Form Controls uses some functions not available to XSLT 1.0, therefore you will need to have the [EXSLT library](http://exslt.org/) installed (you should do already) and you will need to add the EXSLT namespace to your page. Additionally Form Controls adds all templates and variables to `form` namespace so as not to class with other templates in your website. After including these two required namespaces your page `stylesheet` element should look something like this:
+Form Controls uses some functions not available to XSLT 1.0, therefore you will need to have the [EXSLT library](http://exslt.org/) installed (you should do already) and you will need to add the EXSLT namespace to your page. Additionally Form Controls adds all templates and variables to `form` namespace so as not to clash with other templates in your site. After including these two namespaces, your page `stylesheet` element should look something like this:
 
 	<xsl:stylesheet	version="1.0"
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -32,7 +32,7 @@ Form Controls uses some functions not available to XSLT 1.0, therefore you will 
 		xmlns:form="http://nick-dunn.co.uk/xslt/form-controls"
 		extension-element-prefixes="exsl form">
 
-The `extension-element-prefixes` attributes prevents these namespaces being added to your HTML elements when the page is rendered.
+The `extension-element-prefixes` attribute prevents these namespaces being added to your HTML elements when the page is rendered.
 
 ## Supported form controls
 Form Controls supports all field types native to Symphony (input, textarea, select) and adds a few of its own too. It can generate the following:
@@ -47,7 +47,7 @@ Form Controls supports all field types native to Symphony (input, textarea, sele
 * Checkbox List
 * Validation Summary (list of error messages)
 
-Form Controls assumes you are submitting to a front-end event in Symphony. In the examples below I will outline the basic structure of the section that the event derives from. For brevity I assume that your pages include a `master.xsl` which outputs the page header/footer.
+Form Controls assumes you are submitting to a front-end event in Symphony.
 
 ## Most basic example
 Submits to an event (`save-post`) derived from a Posts section. Create a new page and attach the `Save Post` event to it. Paste the following XSLT into your page replacing the default contents:
@@ -59,12 +59,10 @@ Submits to an event (`save-post`) derived from a Posts section. Create a new pag
 		xmlns:form="http://nick-dunn.co.uk/xslt/form-controls"
 		extension-element-prefixes="exsl form">
 
-	<xsl:import href="../utilities/master.xsl"/>
-
 	<!-- Import form-controls.xsl -->
 	<xsl:import href="../utilities/form-controls.xsl"/>
 
-	<!-- Define a global variable referring to your Event -->
+	<!-- Define a global variable pointing to your Event -->
 	<xsl:variable name="form:event" select="/data/events/save-blog-post"/>
 
 	<xsl:template match="data">
@@ -112,13 +110,13 @@ This will generate HTML akin to the following (just the `fieldset` included, my 
 		</label>
 	</fieldset>
 	
-On form submit you will also receive a validation summary — either a success message, or a list of missing or invalid fields.
+On form submit you will also see a validation summary — either a success message, or a list of missing or invalid fields.
 
 ## Template examples
-Here are examples outlining the full range of options. Additional information regarding each template and its parameters can be gleaned from the source.
+Here are examples outlining the full range of control templates.
 
 ### form:event
-This variable should be created globally, outside of your page templates. It should select the event node created by the event you are posting to.
+This variable should be created globally, outside of the page templates. It should select the event node created by the event you are posting to.
 
 	<xsl:variable name="form:event" select="/data/events/save-blog-post"/>
 
@@ -140,6 +138,7 @@ Renders an HTML `label` element that can be explicitly assigned to another form 
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'title'"/>
 	</xsl:call-template>
+
 
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'title'"/>
@@ -217,7 +216,7 @@ Renders an HTML checkbox `input` element. If a checkbox is not checked, its valu
 * `allow-multiple-value` (optional, string): Internal use only. Overrides default "yes" value when part of a checkbox list
 
 #### Example
-
+	
 	<!-- renders a checkbox (ticked), inside a label with the label text following the checkbox -->
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'published'"/>
@@ -307,7 +306,7 @@ Renders an HTML `select` element. Has several presets to build commonly-used set
 
 In the above example, multiple selected options can be achieved by passing XML to the `value` parameter. Only the node text value is used (no attributes).
 
-The `options` parameter accepts any XML: an XPath expression as the `select` attribute, a child `xsl:copy-of`, hard-coded, or a combination of the latter:
+The `options` parameter accepts only XML: an XPath expression as the `select` attribute, a child `xsl:copy-of`, hard-coded, or a combination of the latter:
 
 	<xsl:with-param name="options">
 		<option value="">Select a country:</option>
