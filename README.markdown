@@ -405,12 +405,46 @@ Renders a success/error message and list of invalid fields.
 	</xsl:call-template>
 
 ## Multiple forms per page
-* Passing $event as a parameter rather than a global variable
+In the "Most basic example" above a global `form:event` variable was created to refer to the Symphony event being used. While this is tidy for simple examples, if you need more than one form per page, then the `form:event` variable cannot be redefined for each form. For this reason, you should pass the optional `event` parameter to each control template:
+
+	<xsl:call-template name="form:input">
+		<xsl:with-param name="event" select="/data/events/save-blog-post"/>
+		<xsl:with-param name="handle" select="'title'"/>
+		<xsl:with-param name="value" select="'My first blog post'"/>
+	</xsl:call-template>
 
 ## Submitting to multiple sections (EventEx)
-* Using EventEx, section handles
-* Validation summary for a specific section
+[EventEx](http://github.com/yourheropaul/eventex/tree/master) is a wrapper around Symphony's event model which allows you to submit entries to more than one section at a time. Form Controls has been developed in conjunction with EventEx, so they support and complement each other well.
+
+### Section handles instead of `fields`
+The Symphony default is to pass field names in the form `fields[handle]`. EventEx changes this so that `fields` becomes the handle of the section into which you are posting. To account for this, each control template has an optional `section` parameter which defaults to `fields`:
+
+	<xsl:call-template name="form:input">
+		<xsl:with-param name="section" select="'articles'"/>
+		<xsl:with-param name="handle" select="'title'"/>
+	</xsl:call-template>
+	
+	<input type="text" name="articles[title]" />
+
+Posting multiple entries is also supported, using a numeric predicate that can be passed in the `section` parameter:
+
+	<xsl:call-template name="form:input">
+		<xsl:with-param name="section" select="'articles[0]'"/>
+		<xsl:with-param name="handle" select="'title'"/>
+	</xsl:call-template>
+
+	<input type="text" name="articles[0][title]" />
+
+### Granular validation reporting
+
+EventEx will return an `entry` node in the `<events>` nodeset for each entry it tries to create. If submitting to multiple sections then it is likely to want to validate fields by section. The `validation-summary` also accepts a `section` parameter so that it will show errors only for this section:
+	
+	<xsl:call-template name="form:validation-summary">
+		<xsl:with-param name="section" select="'articles'"/>
+	</xsl:call-template>
 
 ## Building a form automatically (Section Schemas)
+Todo:
+
 * Using Section Schemas
 * Forthcoming `form:build-control` template
