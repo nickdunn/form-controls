@@ -1070,11 +1070,11 @@ Returns: XML
 <xsl:template match="text()" mode="form:replace-template">
 	<xsl:param name="replacement"/>
 	<xsl:choose>
-		<xsl:when test=". = '$'">
+		<xsl:when test="string(.) = '$'">
 			<xsl:value-of select="normalize-space($replacement)"/>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="."/>
+			<xsl:value-of select="string(.)"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
