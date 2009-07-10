@@ -177,6 +177,7 @@ Parameters:
 	<xsl:param name="child"/>
 	<xsl:param name="child-position" select="'after'"/>
 	<xsl:param name="class"/>
+	<xsl:param name="template"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
 	
@@ -201,15 +202,28 @@ Parameters:
 			<xsl:copy-of select="$child"/>
 		</xsl:if>
 		
+		<xsl:variable name="text">
+			<xsl:choose>
+				<xsl:when test="$text and $child">
+					<xsl:value-of select="concat($text,' ')"/>
+				</xsl:when>
+				<xsl:when test="$text">
+					<xsl:value-of select="$text"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="concat($for,' ')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:choose>
-			<xsl:when test="$text and $child">
-				<xsl:value-of select="concat($text,' ')"/>
-			</xsl:when>
-			<xsl:when test="$text">
-				<xsl:value-of select="$text"/>
+			<xsl:when test="$template">
+				<xsl:apply-templates select="exsl:node-set($template)" mode="form:replace-template">
+					<xsl:with-param name="replacement" select="$text"/>
+				</xsl:apply-templates>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="concat($for,' ')"/>
+				<xsl:value-of select="$text"/>
 			</xsl:otherwise>
 		</xsl:choose>
 		
@@ -1020,6 +1034,49 @@ Returns: a nodeset of <option> elements
 			<xsl:with-param name="direction" select="$direction"/>
 		</xsl:call-template>
 	</xsl:if>  
+</xsl:template>
+
+<!--
+Name: form:replace-template, matches element nodes
+Description: traverse a block of XML and replace placeholder with text string
+Returns: XML
+-->
+<xsl:template match="*" mode="form:replace-template">
+	<xsl:param name="replacement"/>
+	<xsl:element name="{name()}">
+		<xsl:apply-templates select="* | @* | text()" mode="form:replace-template">
+			<xsl:with-param name="replacement" select="$replacement"/>
+		</xsl:apply-templates>
+	</xsl:element>
+</xsl:template>
+
+<!--
+Name: form:replace-template, matches attribute node
+Description: traverse a block of XML and replace placeholder with text string
+Returns: XML
+-->
+<xsl:template match="@*" mode="form:replace-template">
+	<xsl:param name="replacement"/>
+	<xsl:attribute name="{name(.)}">
+		<xsl:value-of select="."/>
+	</xsl:attribute>
+</xsl:template>
+
+<!--
+Name: form:replace-template, matches text nodes
+Description: traverse a block of XML and replace placeholder with text string
+Returns: XML
+-->
+<xsl:template match="text()" mode="form:replace-template">
+	<xsl:param name="replacement"/>
+	<xsl:choose>
+		<xsl:when test=". = '$'">
+			<xsl:value-of select="normalize-space($replacement)"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="."/>
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>
