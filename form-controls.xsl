@@ -613,17 +613,17 @@ Parameters:
 					<option value="12">December</option>
 				</xsl:when>
 				
-				<xsl:when test="string(substring($options, 1, 5))='years'">
+				<xsl:when test="string(substring($options,1,5))='years'">
 					<option value="">Year</option>
 					<xsl:choose>
-						<xsl:when test="substring($options, 6, 1)='-'">
+						<xsl:when test="substring($options,6,1)='-'">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'-') + 1)"/>
 								<xsl:with-param name="direction" select="'-'"/>
 							</xsl:call-template>
 						</xsl:when>
-						<xsl:when test="substring($options, 6, 1)='+'">
+						<xsl:when test="substring($options,6,1)='+'">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'+') + 1)"/>
@@ -924,7 +924,7 @@ Returns: string
 		</xsl:choose>
 	</xsl:variable-->
 	
-	<xsl:value-of select="concat($section, '[', $handle, ']')"/>
+	<xsl:value-of select="concat($section,'[',$handle,']')"/>
 </xsl:template>
 
 <!--
@@ -935,7 +935,7 @@ Returns: string
 <xsl:template name="form:control-id">
 	<xsl:param name="name"/>
 		
-	<xsl:value-of select="translate(translate($name, '[', '-'),']','')"/>
+	<xsl:value-of select="translate(translate($name,'[','-'),']','')"/>
 </xsl:template>
 
 <!--
@@ -1002,7 +1002,7 @@ Returns: string
 	<xsl:param name="section"/>
 	
 	<xsl:if test="contains($section,'[')">
-		<xsl:value-of select="substring-after(substring-before($section, ']'),'[')"/>
+		<xsl:value-of select="substring-after(substring-before($section,']'),'[')"/>
 	</xsl:if>
 </xsl:template>
 
