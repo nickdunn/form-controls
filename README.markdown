@@ -130,6 +130,7 @@ Renders an HTML `label` element that can be explicitly assigned to another form 
 * `child` (optional, XML): Places this XML inside the label, for wrapping elements with the label
 * `child-position` (optional, string): Place the child before or after the label text. Defaults to "after"
 * `class` (optional, string): Value of the HTML @class attribute
+* `template` (optional, XML): HTML template for label contents. Use `$` as placeholder for label text
 * `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
 * `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 
@@ -139,6 +140,13 @@ Renders an HTML `label` element that can be explicitly assigned to another form 
 		<xsl:with-param name="for" select="'title'"/>
 	</xsl:call-template>
 
+	<xsl:call-template name="form:label">
+		<xsl:with-param name="for" select="'title'"/>
+		<xsl:with-param name="text" select="'Post Title'"/>
+		<xsl:with-param name="template">
+			<span>$ <span class="required">*</span></span>
+		</xsl:with-param>
+	</xsl:call-template>
 
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'title'"/>
@@ -383,11 +391,11 @@ Multiple selected options can be achieved by passing XML to the `value` paramete
 Renders a success/error message and list of invalid fields.
 
 #### Parameters
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 * `error-message` (optional, string/XPath): Error notification message. Defaults to Symphony Event message
 * `success-message` (optional, string/XPath): Success notification message. Defaults to Symphony Event message
-* `erorrs` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony Event defaults
+* `errors` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony field defaults
 * `section` (optional, string): Use with EventEx to show errors for a specific section handle only
-* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 
 #### Example
 
@@ -397,12 +405,19 @@ Renders a success/error message and list of invalid fields.
 		<xsl:with-param name="success-message" select="'The entry was saved.'"/>
 		<xsl:with-param name="error-message" select="'The entry was not saved because of the following errors:'"/>
 		<xsl:with-param name="errors">
-			<error handle="title">Post Title contained an error</error>
-			<error handle="email-address" type="missing">Please enter your e-mail address</error>
-			<error handle="email-address" type="invalid">Please enter a valid e-mail address</error>
-			<error handle="content" type="missing,invalid">Post Content is missing or invalid</error>
+			<error handle="title">Post Title contained an unspecified error</error>
+			<error handle="email" type="missing">E-mail is a required field!</error>
+			<error handle="email" type="invalid">Please enter a valid e-mail address</error>
+			<error handle="content" type="missing,invalid">Post Content is either missing or invalid</error>
+			<error handle="email" message="Value must be unique.">Someone is already using this e-mail address!</error>
 		</xsl:with-param>
 	</xsl:call-template>
+
+By default the validation summary will return an unordered list of errors from the event. Symphony fields provide relatively useful messages themselve and these will be used by default. Symphony 2.0.3 added support for the verbose error in the XML so this is used if found — otherwise a message concatenating the field name and "invalid" or "missing" label is made.
+
+There are ocassions where this is insufficient and more friendly messages are required. Individual fields can be targeted by their handle and a new message provided. Overrides for specific scenarios are supported by specifying the error type (`invalid` or `missing`).
+
+Sometimes even this is not sufficient. In the case of a Unique Input field, an `invalid` response is given both when the field fails regular expression validation, or if the uniquity check finds that the value already exists. In this instance we need two separate messages. Since Symphony 2.0.3 provides the exact error message returned by the field this can be matched-on and an override provided. In the above example `email` is a Unique Input field and returns a different error when it fails regular expression validation and uniquity validation.
 
 ## Multiple forms per page
 In the "Most basic example" above a global `form:event` variable was created to refer to the Symphony event being used. While this is tidy for simple examples, if you need more than one form per page, then the `form:event` variable cannot be redefined for each form. For this reason, you should pass the optional `event` parameter to each control template:
