@@ -431,8 +431,8 @@ In the "Most basic example" above a global `form:event` variable was created to 
 ## Submitting to multiple sections (EventEx)
 [EventEx](http://github.com/yourheropaul/eventex/tree/master) is a wrapper around Symphony's event model which allows you to submit entries to more than one section at a time. Form Controls has been developed in conjunction with EventEx, so they support and complement each other well.
 
-### Section handles instead of `fields`
-The Symphony default is to pass field names in the form `fields[handle]`. EventEx changes this so that `fields` becomes the handle of the section into which you are posting. To account for this, each control template has an optional `section` parameter which defaults to `fields`:
+### Using section handles `articles[...]` instead of `fields[...]`
+The Symphony default is to pass field names in the form `fields[handle]`. EventEx changes this so that `fields` is repaced with the handle of the section into which you are posting. To account for this, each control template has an optional `section` parameter which defaults to `fields`:
 
 	<xsl:call-template name="form:input">
 		<xsl:with-param name="section" select="'articles'"/>
@@ -452,7 +452,7 @@ Posting multiple entries is also supported, using a numeric predicate that can b
 
 ### Granular validation reporting
 
-EventEx will return an `entry` node in the `<events>` nodeset for each entry it tries to create. If submitting to multiple sections then it is likely to want to validate fields by section. The `validation-summary` also accepts a `section` parameter so that it will show errors only for this section:
+EventEx will return an `entry` node in the `<events>` nodeset for each entry it tries to modify. If submitting to multiple sections then it is likely to want to validate fields by section. The `validation-summary` also accepts a `section` parameter so that it will show errors only for one section:
 	
 	<xsl:call-template name="form:validation-summary">
 		<xsl:with-param name="section" select="'articles'"/>
