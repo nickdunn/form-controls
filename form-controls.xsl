@@ -90,8 +90,8 @@ Parameters:
 								<xsl:choose>
 									
 									<!-- @message and a section specified -->
-									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section = current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section = current()/parent::entry/@section-handle]"/>
+									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- missing -->
 									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and string(@message)=string(current()/@message)]">
@@ -99,8 +99,8 @@ Parameters:
 									</xsl:when>
 									
 									<!-- missing and a section specified -->
-									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section = current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section = current()/parent::entry/@section-handle]"/>
+									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- missing -->
 									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing')]">
@@ -108,8 +108,8 @@ Parameters:
 									</xsl:when>
 
 									<!-- invalid and a section specified-->
-									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section = current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section = current()/parent::entry/@section-handle]"/>
+									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section=current()/parent::entry/@section-handle]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section=current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- invalid -->
 									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]">
@@ -117,8 +117,8 @@ Parameters:
 									</xsl:when>
 									
 									<!-- no specific type match, section specified -->
-									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and @section = current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @section = current()/parent::entry/@section-handle]"/>
+									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and @section=current()/parent::entry/@section-handle]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @section=current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- no specific type match -->
 									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and not(@message)]">
@@ -613,17 +613,17 @@ Parameters:
 					<option value="12">December</option>
 				</xsl:when>
 				
-				<xsl:when test="string(substring($options, 1, 5)) = 'years'">
+				<xsl:when test="string(substring($options, 1, 5))='years'">
 					<option value="">Year</option>
 					<xsl:choose>
-						<xsl:when test="substring($options, 6, 1) = '-'">
+						<xsl:when test="substring($options, 6, 1)='-'">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'-') + 1)"/>
 								<xsl:with-param name="direction" select="'-'"/>
 							</xsl:call-template>
 						</xsl:when>
-						<xsl:when test="substring($options, 6, 1) = '+'">
+						<xsl:when test="substring($options, 6, 1)='+'">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'+') + 1)"/>
@@ -1070,7 +1070,7 @@ Returns: XML
 <xsl:template match="text()" mode="form:replace-template">
 	<xsl:param name="replacement"/>
 	<xsl:choose>
-		<xsl:when test="string(.) = '$'">
+		<xsl:when test="string(.)='$'">
 			<xsl:value-of select="normalize-space($replacement)"/>
 		</xsl:when>
 		<xsl:otherwise>
