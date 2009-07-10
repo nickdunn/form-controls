@@ -9,7 +9,7 @@
 <!--
 Name: Form Controls
 Description: An XSLT utility to create powerful HTML forms with Symphony
-Version: 1.0
+Version: 1.1
 Author: Nick Dunn <http://github.com/nickdunn>
 URL: http://github.com/nickdunn/form-controls/tree/master
 -->
@@ -24,16 +24,16 @@ Returns: HTML
 Parameters:
 * `error-message` (optional, string/XPath): Error notification message. Defaults to Symphony Event message
 * `success-message` (optional, string/XPath): Success notification message. Defaults to Symphony Event message
-* `erorrs` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony Event defaults
+* `errors` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony Event defaults
 * `section` (optional, string): Use with EventEx to show errors for a specific section handle only
 * `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:validation-summary">
+	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="error-message" select="$event/message"/>
 	<xsl:param name="success-message" select="$event/message"/>
 	<xsl:param name="errors"/>
 	<xsl:param name="section" select="'fields'"/>
-	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
@@ -88,7 +88,16 @@ Parameters:
 								</xsl:attribute>
 
 								<xsl:choose>
-
+									
+									<!-- @message and a section specified -->
+									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section = current()/parent::entry/@section-handle]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section = current()/parent::entry/@section-handle]"/>
+									</xsl:when>
+									<!-- missing -->
+									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and string(@message)=string(current()/@message)]">
+										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message]"/>
+									</xsl:when>
+									
 									<!-- missing and a section specified -->
 									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section = current()/parent::entry/@section-handle]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section = current()/parent::entry/@section-handle]"/>
@@ -106,16 +115,20 @@ Parameters:
 									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]"/>
 									</xsl:when>
-
+									
 									<!-- no specific type match, section specified -->
 									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and @section = current()/parent::entry/@section-handle]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @section = current()/parent::entry/@section-handle]"/>
 									</xsl:when>
 									<!-- no specific type match -->
-									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type)]">
+									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and not(@message)]">
 										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current())]"/>
 									</xsl:when>
-
+									
+									<xsl:when test="@message">
+										<xsl:value-of select="@message"/>
+									</xsl:when>
+									
 									<xsl:otherwise>
 										<span class="field-name">
 											<xsl:value-of select="translate(name(),'-',' ')"/>
