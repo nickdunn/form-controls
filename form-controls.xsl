@@ -66,7 +66,14 @@ Parameters:
 			
 			<div class="validation-summary error">
 
-				<p><xsl:value-of select="$error-message"/></p>
+				<xsl:choose>
+					<xsl:when test="exsl:node-set($error-message)/*">
+						<xsl:copy-of select="$error-message"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<p><xsl:value-of select="$error-message"/></p>
+					</xsl:otherwise>
+				</xsl:choose>
 
 				<ul>
 					<xsl:for-each select="exsl:node-set($event-result)//*[not(name()='entry') and @type]">
@@ -150,7 +157,14 @@ Parameters:
 		<xsl:when test="exsl:node-set($event-result)//*[@result='success']">
 		
 			<div class="validation-summary success">
-				<p><xsl:value-of select="$success-message"/></p>
+				<xsl:choose>
+					<xsl:when test="exsl:node-set($success-message)/*">
+						<xsl:copy-of select="$success-message"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<p><xsl:value-of select="$success-message"/></p>
+					</xsl:otherwise>
+				</xsl:choose>
 			</div>
 			
 		</xsl:when>
