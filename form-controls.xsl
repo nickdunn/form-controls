@@ -631,16 +631,20 @@ Parameters:
 		<xsl:variable name="options">
 			<xsl:choose>
 				
-				<xsl:when test="string($options)='days'">
-					<option value="">Day</option>
+				<xsl:when test="starts-with(string($options),'days')">
+					<xsl:if test="not(contains(string($options),'no-label'))">
+						<option value="">Day</option>
+					</xsl:if>
 					<xsl:call-template name="form:incrementor">
 						<xsl:with-param name="start" select="'1'"/>
 						<xsl:with-param name="iterations" select="31"/>
 					</xsl:call-template>
 				</xsl:when>
 				
-				<xsl:when test="string($options)='months'">
-					<option value="">Month</option>
+				<xsl:when test="starts-with(string($options),'months')">
+					<xsl:if test="not(contains(string($options),'no-label'))">
+						<option value="">Month</option>
+					</xsl:if>
 					<option value="01">January</option>
 					<option value="02">February</option>
 					<option value="03">March</option>
@@ -655,17 +659,19 @@ Parameters:
 					<option value="12">December</option>
 				</xsl:when>
 				
-				<xsl:when test="string(substring($options,1,5))='years'">
-					<option value="">Year</option>
+				<xsl:when test="contains(string($options),'years')">
+					<xsl:if test="not(contains(string($options),'no-label'))">
+						<option value="">Year</option>
+					</xsl:if>
 					<xsl:choose>
-						<xsl:when test="substring($options,6,1)='-'">
+						<xsl:when test="contains(string($options),'years-')">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'-') + 1)"/>
 								<xsl:with-param name="direction" select="'-'"/>
 							</xsl:call-template>
 						</xsl:when>
-						<xsl:when test="substring($options,6,1)='+'">
+						<xsl:when test="contains(string($options),'years+')">
 							<xsl:call-template name="form:incrementor">
 								<xsl:with-param name="start" select="$this-year"/>
 								<xsl:with-param name="iterations" select="number(substring-after($options,'+') + 1)"/>
