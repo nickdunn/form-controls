@@ -9,7 +9,7 @@
 <!--
 Name: Form Controls
 Description: An XSLT utility to create powerful HTML forms with Symphony
-Version: 1.1
+Version: 1.2
 Author: Nick Dunn <http://github.com/nickdunn>
 URL: http://github.com/nickdunn/form-controls/tree/master
 -->
@@ -79,7 +79,6 @@ Parameters:
 					<xsl:for-each select="exsl:node-set($event-result)//*[not(name()='entry') and @type]">
 						<li>
 							<label>
-
 								<xsl:attribute name="for">
 									<xsl:choose>
 										<xsl:when test="parent::entry/@index-key">
@@ -160,7 +159,7 @@ Parameters:
 										<xsl:value-of select="@type"/>
 									</xsl:otherwise>
 
-								</xsl:choose>
+								</xsl:choose>								
 							</label>
 						</li>
 					</xsl:for-each>
@@ -453,7 +452,7 @@ Returns: HTML <input> element
 Parameters:
 * `handle` (mandatory, string): Handle of the field name
 * `value` (optional, string): Initial value of form control. Will not work for `file` inputs.
-* `type` (optional, string): Type attribute value ("text", "password" "file"). Defaults to "text"
+* `type` (optional, string): Type attribute value ("text", "password" "file", "hidden"). For "checkbox" and "radio" types see form:checkbox and form:radio templates. Defaults to "text"
 * `class` (optional, string): Class attribute value
 * `title` (optional, string): Title attribute value
 * `size` (optional, string): Size attribute value
