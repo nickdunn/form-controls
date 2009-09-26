@@ -98,38 +98,54 @@ Parameters:
 									
 									<!-- @message and a section specified -->
 									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]"/>
+										</xsl:call-template>
 									</xsl:when>
 									<!-- missing -->
 									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and string(@message)=string(current()/@message)]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message]"/>
+										</xsl:call-template>
 									</xsl:when>
 									
 									<!-- missing and a section specified -->
 									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]"/>
+										</xsl:call-template>
 									</xsl:when>
 									<!-- missing -->
 									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing')]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing')]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing')]"/>
+										</xsl:call-template>
 									</xsl:when>
 
 									<!-- invalid and a section specified-->
 									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section=current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section=current()/parent::entry/@section-handle]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid') and @section=current()/parent::entry/@section-handle]"/>
+										</xsl:call-template>
 									</xsl:when>
 									<!-- invalid -->
 									<xsl:when test="@type='invalid' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]"/>
+										</xsl:call-template>
 									</xsl:when>
 									
 									<!-- no specific type match, section specified -->
 									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and @section=current()/parent::entry/@section-handle]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current()) and @section=current()/parent::entry/@section-handle]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and @section=current()/parent::entry/@section-handle]"/>
+										</xsl:call-template>
 									</xsl:when>
 									<!-- no specific type match -->
 									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and not(@message)]">
-										<xsl:value-of select="exsl:node-set($errors)/error[@handle=name(current())]"/>
+										<xsl:call-template name="form:validation-label">
+											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current())]"/>
+										</xsl:call-template>
 									</xsl:when>
 									
 									<xsl:when test="@message">
@@ -170,6 +186,18 @@ Parameters:
 		</xsl:when>
 	</xsl:choose>
 
+</xsl:template>
+
+<xsl:template name="form:validation-label">
+	<xsl:param name="label"/>
+	<xsl:choose>
+		<xsl:when test="$label/*">
+			<xsl:copy-of select="$label/text() | $label/*"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="$label"/>
+		</xsl:otherwise>
+	</xsl:choose>	
 </xsl:template>
 
 <!--
