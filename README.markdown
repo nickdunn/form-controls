@@ -413,11 +413,17 @@ Renders a success/error message and list of invalid fields.
 		</xsl:with-param>
 	</xsl:call-template>
 
-By default the validation summary will return an unordered list of errors from the event. Symphony fields provide relatively useful messages themselve and these will be used by default. Symphony 2.0.3 added support for the verbose error in the XML so this is used if found — otherwise a message concatenating the field name and "invalid" or "missing" label is made.
+By default the validation summary will return an unordered list of errors from the event. Symphony fields provide relatively useful messages themselves and these will be used by default. Symphony 2.0.3 added support for the verbose error in the XML so this is used if found — otherwise a message concatenating the field name and "invalid" or "missing" is returned.
 
-There are ocassions where this is insufficient and more friendly messages are required. Individual fields can be targeted by their handle and a new message provided. Overrides for specific scenarios are supported by specifying the error type (`invalid` or `missing`).
+There are occassions where this is insufficient and more friendly messages are required. Individual fields can be targeted by their handle and a new message provided. Overrides for specific scenarios are supported by specifying the error type (`invalid` or `missing`).
 
-Sometimes even this is not sufficient. In the case of a Unique Input field, an `invalid` response is given both when the field fails regular expression validation, or if the uniquity check finds that the value already exists. In this instance we need two separate messages. Since Symphony 2.0.3 provides the exact error message returned by the field this can be matched-on and an override provided. In the above example `email` is a Unique Input field and returns a different error when it fails regular expression validation and uniquity validation.
+Sometimes even this is not sufficient. In the case of a Unique Input field, an `invalid` response is given both when the field fails regular expression validation, or if the uniquity check finds that the value already exists. In this instance we need two separate messages. Since Symphony 2.0.3 provides the exact error message returned by the field this can be matched upon and an override provided. In the above example `email` is a Unique Input field and returns a different error for regular expression validation and uniquity validation.
+
+When a string is used for `success-message` or `error-message` these are rendered in a `<p>` element in the HTML. However for greater flexibility you can pass HTML for these parameters and have it rendered without a `<p>` container:
+	
+	<xsl:with-param name="success-message">
+		<em>Congratulations!</em> The form saved successfully.
+	</xsl:with-param>
 
 ## Multiple forms per page
 In the "Most basic example" above a global `form:event` variable was created to refer to the Symphony event being used. While this is tidy for simple examples, if you need more than one form per page, then the `form:event` variable cannot be redefined for each form. For this reason, you should pass the optional `event` parameter to each control template:
