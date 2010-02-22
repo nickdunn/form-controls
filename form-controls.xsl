@@ -537,9 +537,19 @@ Parameters:
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
 	
-	<xsl:variable name="initial-value" select="normalize-space($value)"/>
+	<xsl:variable name="initial-value" select="$value"/>
+	<xsl:variable name="initial-value-normalized" select="normalize-space($value)"/>
 	
 	<xsl:variable name="postback-value">
+		<xsl:call-template name="form:postback-value">
+			<xsl:with-param name="event" select="$event"/>
+			<xsl:with-param name="handle" select="$handle"/>
+			<xsl:with-param name="section" select="$section"/>
+			<xsl:with-param name="normalize" select="'no'"/>
+		</xsl:call-template>
+	</xsl:variable>
+	
+	<xsl:variable name="postback-value-normalized">
 		<xsl:call-template name="form:postback-value">
 			<xsl:with-param name="event" select="$event"/>
 			<xsl:with-param name="handle" select="$handle"/>
@@ -558,7 +568,7 @@ Parameters:
 		</xsl:if>
 		
 		<xsl:choose>
-			<xsl:when test="$event and ($initial-value != $postback-value)">
+			<xsl:when test="$event and ($initial-value-normalized != $postback-value-normalized)">
 				<xsl:value-of select="$postback-value"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -993,6 +1003,7 @@ Returns: string
 <xsl:template name="form:postback-value">
 	<xsl:param name="handle"/>
 	<xsl:param name="section"/>
+	<xsl:param name="normalize" select="'yes'"/>
 	<xsl:param name="event" select="$form:event"/>
 	
 	<xsl:variable name="index-key">
@@ -1009,14 +1020,35 @@ Returns: string
 	
 	<xsl:choose>
 		<xsl:when test="$section!='fields' and $index-key!=''">
-			<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle])"/>
+			<xsl:choose>
+				<xsl:when test="$normalize='yes'">
+					<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle])"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle]"/>
+				</xsl:otherwise>
+			</xsl:choose>			
 		</xsl:when>
 		<xsl:when test="$section!='fields'">
-			<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle])"/>
+			<xsl:choose>
+				<xsl:when test="$normalize='yes'">
+					<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle])"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle]"/>
+				</xsl:otherwise>
+			</xsl:choose>			
 		</xsl:when>
 		<xsl:otherwise>
 			<xsl:for-each select="$event/post-values/*[name()=$handle]">
-				<value><xsl:value-of select="normalize-space(.)"/></value>
+				<xsl:choose>
+					<xsl:when test="$normalize='yes'">
+						<value><xsl:value-of select="normalize-space(.)"/></value>
+					</xsl:when>
+					<xsl:otherwise>
+						<value><xsl:value-of select="."/></value>
+					</xsl:otherwise>
+				</xsl:choose>				
 			</xsl:for-each>
 		</xsl:otherwise>
 	</xsl:choose>
