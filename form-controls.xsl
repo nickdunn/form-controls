@@ -725,7 +725,7 @@ Parameters:
 					<xsl:attribute name="value"><xsl:value-of select="@value"/></xsl:attribute>
 				</xsl:if>
 				
-				<xsl:if test="($event and $option-value=exsl:node-set($postback-value)/value) or (not($event) and $option-value=exsl:node-set($initial-value)/*)">
+				<xsl:if test="($event and $option-value=$postback-value) or ($event and $option-value=exsl:node-set($postback-value)/value) or (not($event) and $option-value=exsl:node-set($initial-value)/*)">
 					<xsl:attribute name="selected"><xsl:text>selected</xsl:text></xsl:attribute>
 				</xsl:if>
 				
