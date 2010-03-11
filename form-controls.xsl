@@ -9,7 +9,7 @@
 <!--
 Name: Form Controls
 Description: An XSLT utility to create powerful HTML forms with Symphony
-Version: 1.2
+Version: 1.4
 Author: Nick Dunn <http://github.com/nickdunn>
 URL: http://github.com/nickdunn/form-controls/tree/master
 -->
@@ -625,7 +625,7 @@ Parameters:
 	
 	<xsl:element name="select" use-attribute-sets="form:attributes-general">
 		
-		<xsl:if test="$allow-multiple">
+		<xsl:if test="$allow-multiple='yes'">
 			<xsl:attribute name="multiple">multiple</xsl:attribute>
 			<xsl:variable name="name">
 				<xsl:call-template name="form:control-name">
