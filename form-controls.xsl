@@ -9,7 +9,7 @@
 <!--
 Name: Form Controls
 Description: An XSLT utility to create powerful HTML forms with Symphony
-Version: 1.4
+Version: 1.5
 Author: Nick Dunn <http://github.com/nickdunn>
 URL: http://github.com/nickdunn/form-controls/tree/master
 -->
@@ -606,7 +606,7 @@ Parameters:
 
 	<xsl:variable name="initial-value">
 		<xsl:choose>
-			<xsl:when test="count(exsl:node-set($value)/*) &gt; 1">
+			<xsl:when test="exsl:node-set($value)/*">
 				<xsl:copy-of select="$value"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -725,8 +725,19 @@ Parameters:
 					<xsl:attribute name="value"><xsl:value-of select="@value"/></xsl:attribute>
 				</xsl:if>
 				
-				<xsl:if test="($event and $option-value=$postback-value) or ($event and $option-value=exsl:node-set($postback-value)/value) or (not($event) and $option-value=exsl:node-set($initial-value)/*)">
-					<xsl:attribute name="selected"><xsl:text>selected</xsl:text></xsl:attribute>
+				<xsl:if test="
+					($event and (
+						$option-value = $postback-value or 
+						exsl:node-set($postback-value)//*[text()=$option-value] or
+						exsl:node-set($postback-value)//*[@id=$option-value]
+					)) or 
+					(not($event) and (
+						$option-value = $initial-value or 
+						exsl:node-set($initial-value)//*[text()=$option-value] or
+						exsl:node-set($initial-value)//*[@id=$option-value]
+					))
+					">
+					<xsl:attribute name="selected">selected</xsl:attribute>
 				</xsl:if>
 				
 				<xsl:value-of select="text()"/>
@@ -1021,6 +1032,9 @@ Returns: string
 	<xsl:choose>
 		<xsl:when test="$section!='fields' and $index-key!=''">
 			<xsl:choose>
+				<xsl:when test="$event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle]/*">
+					<xsl:copy-of select="$event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle]/*"/>
+				</xsl:when>
 				<xsl:when test="$normalize='yes'">
 					<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle])"/>
 				</xsl:when>
@@ -1031,6 +1045,9 @@ Returns: string
 		</xsl:when>
 		<xsl:when test="$section!='fields'">
 			<xsl:choose>
+				<xsl:when test="$event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle]/*">
+					<xsl:copy-of select="$event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle]/*"/>
+				</xsl:when>
 				<xsl:when test="$normalize='yes'">
 					<xsl:value-of select="normalize-space($event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle])"/>
 				</xsl:when>
@@ -1042,6 +1059,9 @@ Returns: string
 		<xsl:otherwise>
 			<xsl:for-each select="$event/post-values/*[name()=$handle]">
 				<xsl:choose>
+					<xsl:when test="./*">
+						<xsl:copy-of select="."/>
+					</xsl:when>
 					<xsl:when test="$normalize='yes'">
 						<value><xsl:value-of select="normalize-space(.)"/></value>
 					</xsl:when>
