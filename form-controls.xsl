@@ -163,6 +163,9 @@ Parameters:
 							</label>
 						</li>
 					</xsl:for-each>
+          <xsl:for-each select="//filter[@status = 'failed']">
+              <li><label for="@name"><xsl:value-of select="." /></label></li>
+          </xsl:for-each>
 				</ul>
 
 			</div>
