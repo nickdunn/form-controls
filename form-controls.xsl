@@ -9,7 +9,7 @@
 <!--
 Name: Form Controls
 Description: An XSLT utility to create powerful HTML forms with Symphony
-Version: 1.5
+Version: 1.6
 Author: Nick Dunn <http://github.com/nickdunn>
 URL: http://github.com/nickdunn/form-controls/tree/master
 -->
