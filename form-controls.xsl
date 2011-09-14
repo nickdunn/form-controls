@@ -796,10 +796,18 @@ Parameters:
 					<xsl:with-param name="event" select="$event"/>
 					<xsl:with-param name="handle" select="$handle"/>
 					<xsl:with-param name="section" select="$section"/>
-					<xsl:with-param name="value" select="@value | ."/>
+					<xsl:with-param name="value">
+						<xsl:choose>
+							<xsl:when test="@value"><xsl:value-of select="@value"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
 					<xsl:with-param name="existing-value">
 						<xsl:if test="@selected">
-							<xsl:value-of select="@value | ."/>
+							<xsl:choose>
+								<xsl:when test="@value"><xsl:value-of select="@value"/></xsl:when>
+								<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+							</xsl:choose>
 						</xsl:if>
 					</xsl:with-param>
 				</xsl:call-template>
@@ -859,12 +867,20 @@ Parameters:
 					<xsl:with-param name="handle" select="$handle"/>
 					<xsl:with-param name="section" select="$section"/>
 					<xsl:with-param name="allow-multiple" select="'yes'"/>
-					<xsl:with-param name="allow-multiple-value" select="@value | ."/>
+					<xsl:with-param name="allow-multiple-value">
+						<xsl:choose>
+							<xsl:when test="@value"><xsl:value-of select="@value"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+						</xsl:choose>
+					</xsl:with-param>
 					<xsl:with-param name="checked">
 						<xsl:if test="@selected">yes</xsl:if>
 					</xsl:with-param>
 					<xsl:with-param name="existing-value">
-						<xsl:value-of select="@value | ."/>
+						<xsl:choose>
+							<xsl:when test="@value"><xsl:value-of select="@value"/></xsl:when>
+							<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+						</xsl:choose>
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:with-param>
