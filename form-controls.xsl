@@ -34,19 +34,19 @@ Parameters:
 	<xsl:param name="success-message" select="$event/message"/>
 	<xsl:param name="errors"/>
 	<xsl:param name="section" select="'fields'"/>
-	
+
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:variable name="section-handle">
 		<xsl:call-template name="form:section-handle">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:variable name="event-result">
 		<xsl:choose>
 			<xsl:when test="$section!='fields' and $index-key!=''">
@@ -60,10 +60,10 @@ Parameters:
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
-	
+
 	<xsl:choose>
 		<xsl:when test="exsl:node-set($event-result)//*[@result='error']">
-			
+
 			<div class="validation-summary error">
 
 				<xsl:choose>
@@ -94,7 +94,7 @@ Parameters:
 								</xsl:attribute>
 
 								<xsl:choose>
-									
+
 									<!-- @message and a section specified -->
 									<xsl:when test="@message and exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message and @section=current()/parent::entry/@section-handle]">
 										<xsl:call-template name="form:validation-label">
@@ -107,7 +107,7 @@ Parameters:
 											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and @message=current()/@message]"/>
 										</xsl:call-template>
 									</xsl:when>
-									
+
 									<!-- missing and a section specified -->
 									<xsl:when test="@type='missing' and exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'missing') and @section=current()/parent::entry/@section-handle]">
 										<xsl:call-template name="form:validation-label">
@@ -133,7 +133,7 @@ Parameters:
 											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current()) and contains(@type,'invalid')]"/>
 										</xsl:call-template>
 									</xsl:when>
-									
+
 									<!-- no specific type match, section specified -->
 									<xsl:when test="exsl:node-set($errors)/error[@handle=name(current()) and not(@type) and @section=current()/parent::entry/@section-handle]">
 										<xsl:call-template name="form:validation-label">
@@ -146,11 +146,11 @@ Parameters:
 											<xsl:with-param name="label" select="exsl:node-set($errors)/error[@handle=name(current())]"/>
 										</xsl:call-template>
 									</xsl:when>
-									
+
 									<xsl:when test="@message">
 										<xsl:value-of select="@message"/>
 									</xsl:when>
-									
+
 									<xsl:otherwise>
 										<span class="field-name">
 											<xsl:value-of select="translate(name(),'-',' ')"/>
@@ -159,18 +159,18 @@ Parameters:
 										<xsl:value-of select="@type"/>
 									</xsl:otherwise>
 
-								</xsl:choose>								
+								</xsl:choose>
 							</label>
 						</li>
 					</xsl:for-each>
 				</ul>
 
 			</div>
-			
+
 		</xsl:when>
-		
+
 		<xsl:when test="exsl:node-set($event-result)//*[@result='success']">
-		
+
 			<div class="validation-summary success">
 				<xsl:choose>
 					<xsl:when test="exsl:node-set($success-message)/*">
@@ -181,7 +181,7 @@ Parameters:
 					</xsl:otherwise>
 				</xsl:choose>
 			</div>
-			
+
 		</xsl:when>
 	</xsl:choose>
 
@@ -196,7 +196,7 @@ Parameters:
 		<xsl:otherwise>
 			<xsl:value-of select="$label"/>
 		</xsl:otherwise>
-	</xsl:choose>	
+	</xsl:choose>
 </xsl:template>
 
 <!--
@@ -221,11 +221,11 @@ Parameters:
 	<xsl:param name="template"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:param name="handle" select="$for"/>
-	
+
 	<xsl:element name="label" use-attribute-sets="form:attribute-class">
-		
+
 		<xsl:if test="$for">
 			<xsl:attribute name="for">
 				<xsl:call-template name="form:control-id">
@@ -238,11 +238,11 @@ Parameters:
 				</xsl:call-template>
 			</xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:if test="$child and $child-position='before'">
 			<xsl:copy-of select="$child"/>
 		</xsl:if>
-		
+
 		<xsl:variable name="text">
 			<xsl:choose>
 				<xsl:when test="$text and $child">
@@ -256,7 +256,7 @@ Parameters:
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		
+
 		<xsl:choose>
 			<xsl:when test="$template">
 				<xsl:apply-templates select="exsl:node-set($template)" mode="form:replace-template">
@@ -267,13 +267,13 @@ Parameters:
 				<xsl:value-of select="$text"/>
 			</xsl:otherwise>
 		</xsl:choose>
-		
+
 		<xsl:if test="$child and $child-position='after'">
 			<xsl:copy-of select="$child"/>
 		</xsl:if>
-		
+
 	</xsl:element>
-	
+
 </xsl:template>
 
 <!--
@@ -301,7 +301,7 @@ Parameters:
 	<xsl:param name="event" select="$form:event"/>
 	<xsl:param name="allow-multiple" select="'no'"/>
 	<xsl:param name="allow-multiple-value"/>
-	
+
 	<xsl:if test="$allow-multiple='no'">
 		<input type="hidden" value="no">
 			<xsl:attribute name="name">
@@ -312,7 +312,7 @@ Parameters:
 			</xsl:attribute>
 		</input>
 	</xsl:if>
-	
+
 	<xsl:call-template name="form:radio">
 		<xsl:with-param name="event" select="$event"/>
 		<xsl:with-param name="handle" select="$handle"/>
@@ -338,7 +338,7 @@ Parameters:
 		<xsl:with-param name="type" select="'checkbox'"/>
 		<xsl:with-param name="allow-multiple" select="$allow-multiple"/>
 	</xsl:call-template>
-	
+
 </xsl:template>
 
 <!--
@@ -368,10 +368,10 @@ Parameters:
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="type" select="'radio'"/>
 	<xsl:param name="allow-multiple" select="'no'"/>
-	
+
 	<xsl:variable name="value" select="normalize-space($value)"/>
 	<xsl:variable name="selected-value" select="normalize-space($existing-value)"/>
-	
+
 	<xsl:variable name="postback-value">
 		<xsl:call-template name="form:postback-value">
 			<xsl:with-param name="event" select="$event"/>
@@ -379,11 +379,11 @@ Parameters:
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:element name="input" use-attribute-sets="form:attributes-general">
-	
+
 		<xsl:attribute name="type"><xsl:value-of select="$type"/></xsl:attribute>
-		
+
 		<xsl:if test="$allow-multiple='yes'">
 			<xsl:attribute name="name">
 				<xsl:call-template name="form:control-name">
@@ -393,7 +393,7 @@ Parameters:
 				<xsl:text>[]</xsl:text>
 			</xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:attribute name="value">
 			<xsl:choose>
 				<xsl:when test="$type='checkbox' and $allow-multiple='no'">
@@ -404,7 +404,7 @@ Parameters:
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
-		
+
 		<xsl:choose>
 			<xsl:when test="$type='radio'">
 				<xsl:choose>
@@ -436,13 +436,13 @@ Parameters:
 					<!-- when allowing multiple, check if this value exists -->
 					<xsl:when test="$allow-multiple='yes' and $selected-value='yes'">
 						<xsl:attribute name="checked">checked</xsl:attribute>
-					</xsl:when>					
+					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 		</xsl:choose>
-		  
+
 	</xsl:element>
-	
+
 </xsl:template>
 
 <!--
@@ -472,7 +472,7 @@ Parameters:
 	<xsl:param name="autocomplete"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="initial-value" select="normalize-space($value)"/>
 
 	<xsl:variable name="postback-value">
@@ -482,23 +482,23 @@ Parameters:
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:element name="input" use-attribute-sets="form:attributes-general">
-		
+
 		<xsl:attribute name="type"><xsl:value-of select="$type"/></xsl:attribute>
-		
+
 		<xsl:if test="$size">
 			<xsl:attribute name="size"><xsl:value-of select="$size"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:if test="$maxlength">
 			<xsl:attribute name="maxlength"><xsl:value-of select="$maxlength"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:if test="$autocomplete='off'">
 			<xsl:attribute name="autocomplete"><xsl:value-of select="$autocomplete"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:attribute name="value">
 			<xsl:choose>
 				<xsl:when test="$event and ($initial-value != $postback-value)">
@@ -509,9 +509,9 @@ Parameters:
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
-	
+
 	</xsl:element>
-	
+
 </xsl:template>
 
 <!--
@@ -536,10 +536,10 @@ Parameters:
 	<xsl:param name="cols"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="initial-value" select="$value"/>
 	<xsl:variable name="initial-value-normalized" select="normalize-space($value)"/>
-	
+
 	<xsl:variable name="postback-value">
 		<xsl:call-template name="form:postback-value">
 			<xsl:with-param name="event" select="$event"/>
@@ -548,7 +548,7 @@ Parameters:
 			<xsl:with-param name="normalize" select="'no'"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:variable name="postback-value-normalized">
 		<xsl:call-template name="form:postback-value">
 			<xsl:with-param name="event" select="$event"/>
@@ -556,17 +556,17 @@ Parameters:
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:element name="textarea" use-attribute-sets="form:attributes-general">
-		
+
 		<xsl:if test="$rows">
 			<xsl:attribute name="rows"><xsl:value-of select="$rows"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:if test="$cols">
 			<xsl:attribute name="cols"><xsl:value-of select="$cols"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:choose>
 			<xsl:when test="$event and ($initial-value-normalized != $postback-value-normalized)">
 				<xsl:value-of select="$postback-value"/>
@@ -575,9 +575,9 @@ Parameters:
 				<xsl:value-of select="$initial-value"/>
 			</xsl:otherwise>
 		</xsl:choose>
-		
+
 	</xsl:element>
-	
+
 </xsl:template>
 
 <!--
@@ -595,7 +595,7 @@ Parameters:
 * `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:select">
-	<xsl:param name="handle"/>	
+	<xsl:param name="handle"/>
 	<xsl:param name="value"/>
 	<xsl:param name="class"/>
 	<xsl:param name="title"/>
@@ -614,7 +614,7 @@ Parameters:
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
-	
+
 	<xsl:variable name="postback-value">
 		<xsl:call-template name="form:postback-value">
 			<xsl:with-param name="event" select="$event"/>
@@ -622,9 +622,9 @@ Parameters:
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:element name="select" use-attribute-sets="form:attributes-general">
-		
+
 		<xsl:if test="$allow-multiple='yes'">
 			<xsl:attribute name="multiple">multiple</xsl:attribute>
 			<xsl:variable name="name">
@@ -636,10 +636,10 @@ Parameters:
 			</xsl:variable>
 			<xsl:attribute name="name"><xsl:value-of select="$name"/></xsl:attribute>
 		</xsl:if>
-		
+
 		<xsl:variable name="options">
 			<xsl:choose>
-				
+
 				<xsl:when test="starts-with(string($options),'days')">
 					<xsl:if test="not(contains(string($options),'no-label'))">
 						<option value="">Day</option>
@@ -649,7 +649,7 @@ Parameters:
 						<xsl:with-param name="iterations" select="31"/>
 					</xsl:call-template>
 				</xsl:when>
-				
+
 				<xsl:when test="starts-with(string($options),'months')">
 					<xsl:if test="not(contains(string($options),'no-label'))">
 						<option value="">Month</option>
@@ -667,7 +667,7 @@ Parameters:
 					<option value="11">November</option>
 					<option value="12">December</option>
 				</xsl:when>
-				
+
 				<xsl:when test="contains(string($options),'years')">
 					<xsl:if test="not(contains(string($options),'no-label'))">
 						<option value="">Year</option>
@@ -688,7 +688,7 @@ Parameters:
 						</xsl:when>
 					</xsl:choose>
 				</xsl:when>
-				
+
 				<xsl:otherwise>
 					<xsl:for-each select="exsl:node-set($options)/* | exsl:node-set($options)">
 						<xsl:if test="text()!=''">
@@ -700,15 +700,15 @@ Parameters:
 								</xsl:if>
 								<xsl:value-of select="text()"/>
 							</option>
-						</xsl:if>						
+						</xsl:if>
 					</xsl:for-each>
 				</xsl:otherwise>
-				
+
 			</xsl:choose>
 		</xsl:variable>
-	
+
 		<xsl:for-each select="exsl:node-set($options)/option">
-			
+
 			<xsl:variable name="option-value">
 				<xsl:choose>
 					<xsl:when test="@value">
@@ -719,33 +719,33 @@ Parameters:
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-		
+
 			<option>
 				<xsl:if test="@value">
 					<xsl:attribute name="value"><xsl:value-of select="@value"/></xsl:attribute>
 				</xsl:if>
-				
+
 				<xsl:if test="
 					($event and (
-						$option-value = $postback-value or 
+						$option-value = $postback-value or
 						exsl:node-set($postback-value)//*[text()=$option-value] or
 						exsl:node-set($postback-value)//*[@id=$option-value]
-					)) or 
+					)) or
 					(not($event) and (
-						$option-value = $initial-value or 
+						$option-value = $initial-value or
 						exsl:node-set($initial-value)//*[text()=$option-value] or
 						exsl:node-set($initial-value)//*[@id=$option-value]
 					))
 					">
 					<xsl:attribute name="selected">selected</xsl:attribute>
 				</xsl:if>
-				
+
 				<xsl:value-of select="text()"/>
 			</option>
-			
+
 		</xsl:for-each>
-		
-  </xsl:element>
+
+	</xsl:element>
 
 </xsl:template>
 
@@ -770,7 +770,7 @@ Parameters:
 	<xsl:param name="options"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="select">
 		<xsl:call-template name="form:select">
 			<xsl:with-param name="event" select="$event"/>
@@ -782,9 +782,9 @@ Parameters:
 			<xsl:with-param name="options" select="$options"/>
 		</xsl:call-template>
 	</xsl:variable>
-		
+
 	<xsl:for-each select="exsl:node-set($select)//option">
-		
+
 		<xsl:call-template name="form:label">
 			<xsl:with-param name="event" select="$event"/>
 			<xsl:with-param name="handle" select="$handle"/>
@@ -813,9 +813,9 @@ Parameters:
 				</xsl:call-template>
 			</xsl:with-param>
 		</xsl:call-template>
-		
+
 	</xsl:for-each>
-	
+
 </xsl:template>
 
 <!--
@@ -832,14 +832,14 @@ Parameters:
 * `event` (optional, XPath): XPath expression to the specific event within the page <events> node
 -->
 <xsl:template name="form:checkbox-list">
-	<xsl:param name="handle"/>	
+	<xsl:param name="handle"/>
 	<xsl:param name="value"/>
 	<xsl:param name="class"/>
 	<xsl:param name="title"/>
 	<xsl:param name="options"/>
 	<xsl:param name="section" select="'fields'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="select">
 		<xsl:call-template name="form:select">
 			<xsl:with-param name="event" select="$event"/>
@@ -852,9 +852,9 @@ Parameters:
 			<xsl:with-param name="allow-multiple" select="'yes'"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:for-each select="exsl:node-set($select)//option">
-		
+
 		<xsl:call-template name="form:label">
 			<xsl:with-param name="event" select="$event"/>
 			<xsl:with-param name="handle" select="$handle"/>
@@ -885,21 +885,21 @@ Parameters:
 				</xsl:call-template>
 			</xsl:with-param>
 		</xsl:call-template>
-		
+
 	</xsl:for-each>
-	
+
 </xsl:template>
 
 <!-- Attributes common to all form controls (name, id, title) -->
 <xsl:attribute-set name="form:attributes-general" use-attribute-sets="form:attribute-class">
-	
+
 	<xsl:attribute name="name">
 		<xsl:call-template name="form:control-name">
 			<xsl:with-param name="handle" select="$handle"/>
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:attribute>
-	
+
 	<xsl:attribute name="id">
 		<xsl:call-template name="form:control-id">
 			<xsl:with-param name="name">
@@ -910,18 +910,18 @@ Parameters:
 			</xsl:with-param>
 		</xsl:call-template>
 	</xsl:attribute>
-	
+
 	<xsl:attribute name="title">
 		<xsl:value-of select="$title"/>
 	</xsl:attribute>
-	
+
 </xsl:attribute-set>
 
 <!-- Class attribute separate so it can be applied independently (for label elements) -->
 <xsl:attribute-set name="form:attribute-class">
-	
+
 	<xsl:attribute name="class">
-		
+
 		<xsl:variable name="valid">
 			<xsl:call-template name="form:control-is-valid">
 				<xsl:with-param name="event" select="$event"/>
@@ -929,7 +929,7 @@ Parameters:
 				<xsl:with-param name="section" select="$section"/>
 			</xsl:call-template>
 		</xsl:variable>
-		
+
 		<xsl:if test="$class or $valid='false'">
 			<xsl:value-of select="$class"/>
 			<xsl:if test="$valid='false'">
@@ -939,9 +939,9 @@ Parameters:
 				<xsl:value-of select="$form:invalid-class"/>
 			</xsl:if>
 		</xsl:if>
-		
+
 	</xsl:attribute>
-	
+
 </xsl:attribute-set>
 
 <!--
@@ -953,19 +953,19 @@ Returns: boolean (string "true|false")
 	<xsl:param name="handle"/>
 	<xsl:param name="section"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:variable name="section-handle">
 		<xsl:call-template name="form:section-handle">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:choose>
 		<xsl:when test="$section!='fields' and $index-key!=''">
 			<xsl:choose>
@@ -996,19 +996,31 @@ Returns: string
 <xsl:template name="form:control-name">
 	<xsl:param name="handle"/>
 	<xsl:param name="section"/>
-	
-	<!--xsl:variable name="section">
-		<xsl:choose>
-			<xsl:when test="$section=''">
-				<xsl:text>fields</xsl:text>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="$section"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable-->
-	
-	<xsl:value-of select="concat($section,'[',$handle,']')"/>
+
+	<xsl:value-of select="$section"/>
+
+	<xsl:call-template name="form:control-build-handle">
+		<xsl:with-param name="handle" select="$handle" />
+	</xsl:call-template>
+</xsl:template>
+
+<xsl:template name="form:control-build-handle">
+	<xsl:param name="handle" />
+
+	<xsl:choose>
+		<xsl:when test="contains($handle, '/')">
+			<xsl:value-of select="concat('[', substring-before($handle, '/'), ']')"/>
+			<xsl:call-template name="form:control-build-handle">
+				<xsl:with-param name="handle" select="substring-after($handle, '/')"/>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:when test="$handle = ' '">
+			<xsl:text>[]</xsl:text>
+		</xsl:when>
+		<xsl:when test="$handle != ''">
+			<xsl:value-of select="concat('[', $handle, ']')"/>
+		</xsl:when>
+	</xsl:choose>
 </xsl:template>
 
 <!--
@@ -1018,7 +1030,7 @@ Returns: string
 -->
 <xsl:template name="form:control-id">
 	<xsl:param name="name"/>
-		
+
 	<xsl:value-of select="translate(translate($name,'[','-'),']','')"/>
 </xsl:template>
 
@@ -1032,20 +1044,21 @@ Returns: string
 	<xsl:param name="section"/>
 	<xsl:param name="normalize" select="'yes'"/>
 	<xsl:param name="event" select="$form:event"/>
-	
+
 	<xsl:variable name="index-key">
 		<xsl:call-template name="form:section-index-key">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:variable name="section-handle">
 		<xsl:call-template name="form:section-handle">
 			<xsl:with-param name="section" select="$section"/>
 		</xsl:call-template>
 	</xsl:variable>
-	
+
 	<xsl:choose>
+		<!-- I don't know this use-case -->
 		<xsl:when test="$section!='fields' and $index-key!=''">
 			<xsl:choose>
 				<xsl:when test="$event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle]/*">
@@ -1057,8 +1070,10 @@ Returns: string
 				<xsl:otherwise>
 					<xsl:value-of select="$event/entry[@section-handle=$section-handle and @index-key=$index-key]/post-values/*[name()=$handle]"/>
 				</xsl:otherwise>
-			</xsl:choose>			
+			</xsl:choose>
 		</xsl:when>
+
+		<!-- I don't know this use-case -->
 		<xsl:when test="$section!='fields'">
 			<xsl:choose>
 				<xsl:when test="$event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle]/*">
@@ -1070,22 +1085,56 @@ Returns: string
 				<xsl:otherwise>
 					<xsl:value-of select="$event/entry[@section-handle=$section-handle]/post-values/*[name()=$handle]"/>
 				</xsl:otherwise>
-			</xsl:choose>			
+			</xsl:choose>
 		</xsl:when>
+
+		<!-- Default event situation -->
 		<xsl:otherwise>
-			<xsl:for-each select="$event/post-values/*[name()=$handle]">
-				<xsl:choose>
-					<xsl:when test="./*">
-						<xsl:copy-of select="."/>
-					</xsl:when>
-					<xsl:when test="$normalize='yes'">
-						<value><xsl:value-of select="normalize-space(.)"/></value>
-					</xsl:when>
-					<xsl:otherwise>
-						<value><xsl:value-of select="."/></value>
-					</xsl:otherwise>
-				</xsl:choose>				
-			</xsl:for-each>
+			<xsl:variable name="value">
+				<xsl:call-template name="form:postback-find-value">
+					<xsl:with-param name="nodeset" select="$event/post-values"/>
+					<xsl:with-param name="handle" select="$handle"/>
+				</xsl:call-template>
+			</xsl:variable>
+
+			<xsl:choose>
+				<xsl:when test="exsl:node-set($value)/*">
+					<xsl:copy-of select="$value"/>
+				</xsl:when>
+				<xsl:when test="$normalize='yes'">
+					<value><xsl:value-of select="normalize-space(exsl:node-set($value))"/></value>
+				</xsl:when>
+				<xsl:otherwise>
+					<value><xsl:value-of select="exsl:node-set($value)"/></value>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+<xsl:template name="form:postback-find-value">
+	<xsl:param name="nodeset"/>
+	<xsl:param name="handle"/>
+
+	<xsl:choose>
+		<!-- Keep searching deeper -->
+		<xsl:when test="contains($handle, '/')">
+			<xsl:call-template name="form:postback-find-value">
+				<xsl:with-param name="nodeset" select="$nodeset/*[name() = substring-before($handle, '/')]"/>
+				<xsl:with-param name="handle" select="substring-after($handle, '/')"/>
+			</xsl:call-template>
+		</xsl:when>
+
+		<!-- Return value -->
+		<xsl:otherwise>
+			<xsl:choose>
+				<xsl:when test="$handle = ' '">
+					<xsl:copy-of select="$nodeset/item"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:copy-of select="$nodeset/*[name()=$handle]"/>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
@@ -1097,7 +1146,7 @@ Returns: a nodeset of <option> elements
 -->
 <xsl:template name="form:section-handle">
 	<xsl:param name="section"/>
-		
+
 	<xsl:choose>
 		<xsl:when test="contains($section,'[')">
 			<xsl:value-of select="substring-before($section,'[')"/>
@@ -1115,7 +1164,7 @@ Returns: string
 -->
 <xsl:template name="form:section-index-key">
 	<xsl:param name="section"/>
-	
+
 	<xsl:if test="contains($section,'[')">
 		<xsl:value-of select="substring-after(substring-before($section,']'),'[')"/>
 	</xsl:if>
@@ -1148,7 +1197,7 @@ Returns: a nodeset of <option> elements
 			<xsl:with-param name="iterations" select="$iterations"/>
 			<xsl:with-param name="direction" select="$direction"/>
 		</xsl:call-template>
-	</xsl:if>  
+	</xsl:if>
 </xsl:template>
 
 <!--
