@@ -89,10 +89,22 @@ Parameters:
 										</xsl:when>
 										<xsl:otherwise>
 											<text>fields</text>
+
+											<xsl:variable name="elem" select="exsl:node-set($errors)/error[@handle=name(current())]"/>
+
 											<xsl:call-template name="form:control-id">
 												<xsl:with-param name="name">
 													<xsl:call-template name="form:control-build-handle">
-														<xsl:with-param name="handle" select="exsl:node-set($errors)/error[@handle=name(current())]/@for"/>
+														<xsl:with-param name="handle">
+															<xsl:choose>
+																<xsl:when test="$elem/@for != ''">
+																	<xsl:value-of select="$elem/@for"/>
+																</xsl:when>
+																<xsl:otherwise>
+																	<xsl:value-of select="$elem/@handle"/>
+																</xsl:otherwise>
+															</xsl:choose>
+														</xsl:with-param>
 													</xsl:call-template>
 												</xsl:with-param>
 											</xsl:call-template>
