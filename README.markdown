@@ -14,7 +14,7 @@ Form Controls provides the following functionality:
 * provides powerful validation messages and error response
 
 ## Download
-Form Controls (form-controls.xsl) is a single XSLT file and can be downloaded from Github:
+Form Controls (`form-controls.xsl`) is a single XSLT file and can be downloaded from Github:
 <http://github.com/nickdunn/form-controls/tree/master>
 
 ## Installing the utility
@@ -66,9 +66,9 @@ Submits to an event (`save-post`) derived from a Posts section. Create a new pag
 	<xsl:variable name="form:event" select="/data/events/save-blog-post"/>
 
 	<xsl:template match="data">
-	
+
 		<form action="" method="post">
-		
+
 			<fieldset>
 				<legend>Create new post</legend>
 
@@ -89,11 +89,11 @@ Submits to an event (`save-post`) derived from a Posts section. Create a new pag
 				</label>
 
 			</fieldset>
-		
+
 		</form>
-	
+
 	</xsl:template>
-	
+
 	</xsl:stylesheet>
 
 This will generate HTML akin to the following (just the `fieldset` included, my indenting):
@@ -109,7 +109,7 @@ This will generate HTML akin to the following (just the `fieldset` included, my 
 			<textarea name="fields[content]" id="fields-content" title="" class=""></textarea>
 		</label>
 	</fieldset>
-	
+
 On form submit you will also see a validation summary — either a success message, or a list of missing or invalid fields.
 
 ## Template examples
@@ -171,9 +171,10 @@ Renders an HTML text `input` element with support for `password` and `file` type
 * `size` (optional, string): Size attribute value
 * `maxlength` (optional, string): Maxlength attribute value
 * `autocomplete` (optional, string): Autocomplete attribute value ("off"). Not set by default
+* `placeholder` (optional, string): Placeholder text. Not set by default
 * `section` (optional, string): Use with EventEx to change "fields[...]" to a section handle
 * `event` (optional, XPath): XPath expression to the specific event within the page <events> node
-	
+
 #### Example
 
 	<xsl:call-template name="form:input">
@@ -188,7 +189,7 @@ Renders an HTML text `input` element with support for `password` and `file` type
 	</xsl:call-template>
 
 ### form:textarea
-Renders an HTML `textarea` element. 
+Renders an HTML `textarea` element.
 
 #### Parameters
 
@@ -224,7 +225,7 @@ Renders an HTML checkbox `input` element. If a checkbox is not checked, its valu
 * `allow-multiple-value` (optional, string): Internal use only. Overrides default "yes" value when part of a checkbox list
 
 #### Example
-	
+
 	<!-- renders a checkbox (ticked), inside a label with the label text following the checkbox -->
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="for" select="'published'"/>
@@ -268,7 +269,7 @@ Renders an HTML radio `input` element. Could be used to save values to an Input 
 		</xsl:with-param>
 		<xsl:with-param name="child-position" select="'before'"/>
 	</xsl:call-template>
-	
+
 	<xsl:call-template name="form:label">
 		<xsl:with-param name="text" select="'Choose Option 2?'"/>
 		<xsl:with-param name="child">
@@ -301,7 +302,7 @@ Renders an HTML `select` element. Has several presets to build commonly-used set
 		<xsl:with-param name="options" select="/data/countries/country"/>
 		<xsl:with-param name="value" select="'United Kingdom'"/>
 	</xsl:call-template>
-	
+
 	<xsl:call-template name="form:select">
 		<xsl:with-param name="handle" select="'categories'"/>
 		<xsl:with-param name="options" select="/data/countries/country"/>
@@ -341,7 +342,7 @@ The `options` parameter also accepts pre-defined string values as aliases for co
 
 	<xsl:with-param name="options" select="'years+20'"/>
 	<option>2009</option>...<option>2029</option>
-	
+
 	<xsl:with-param name="options" select="'years-5'"/>
 	<option>2009</option>...<option>2004</option>
 
@@ -400,7 +401,7 @@ Renders a success/error message and list of invalid fields.
 #### Example
 
 	<xsl:call-template name="form:validation-summary"/>
-	
+
 	<xsl:call-template name="form:validation-summary">
 		<xsl:with-param name="success-message" select="'The entry was saved.'"/>
 		<xsl:with-param name="error-message" select="'The entry was not saved because of the following errors:'"/>
@@ -415,15 +416,35 @@ Renders a success/error message and list of invalid fields.
 
 By default the validation summary will return an unordered list of errors from the event. Symphony fields provide relatively useful messages themselves and these will be used by default. Symphony 2.0.3 added support for the verbose error in the XML so this is used if found — otherwise a message concatenating the field name and "invalid" or "missing" is returned.
 
-There are occassions where this is insufficient and more friendly messages are required. Individual fields can be targeted by their handle and a new message provided. Overrides for specific scenarios are supported by specifying the error type (`invalid` or `missing`).
+There are occasions where this is insufficient and more friendly messages are required. Individual fields can be targeted by their handle and a new message provided. Overrides for specific scenarios are supported by specifying the error type (`invalid` or `missing`).
 
 Sometimes even this is not sufficient. In the case of a Unique Input field, an `invalid` response is given both when the field fails regular expression validation, or if the uniquity check finds that the value already exists. In this instance we need two separate messages. Since Symphony 2.0.3 provides the exact error message returned by the field this can be matched upon and an override provided. In the above example `email` is a Unique Input field and returns a different error for regular expression validation and uniquity validation.
 
 When a string is used for `success-message` or `error-message` these are rendered in a `<p>` element in the HTML. However for greater flexibility you can pass HTML for these parameters and have it rendered without a `<p>` container:
-	
+
 	<xsl:with-param name="success-message">
 		<em>Congratulations!</em> The form saved successfully.
 	</xsl:with-param>
+
+### form:validation
+Renders a validation message for a given field defined by `$handle`
+
+#### Parameters
+* `handle` (mandatory, string): Handle of the field name
+* `errors` (optional, XML): Custom error messages for individual fields as <error> nodes. Defaults to Symphony Event defaults
+* `section` (optional, string): Use with EventEx to show errors for a specific section handle only
+* `event` (optional, XPath): XPath expression to the specific event within the page <events> node
+
+#### Example
+
+	<xsl:call-template name="form:validation">
+		<xsl:with-param name="handle" select="email"/>
+		<xsl:with-param name="errors">
+			<error handle="email" type="missing">E-mail is a required field!</error>
+			<error handle="email" type="invalid">Please enter a valid e-mail address</error>
+			<error handle="email" message="Value must be unique.">Someone is already using this e-mail address!</error>
+		</xsl:with-param>
+	</xsl:call-template>
 
 ## Multiple forms per page
 In the "Most basic example" above a global `form:event` variable was created to refer to the Symphony event being used. While this is tidy for simple examples, if you need more than one form per page, then the `form:event` variable cannot be redefined for each form. For this reason, you should pass the optional `event` parameter to each control template:
@@ -438,13 +459,13 @@ In the "Most basic example" above a global `form:event` variable was created to 
 [EventEx](http://github.com/yourheropaul/eventex/tree/master) is a wrapper around Symphony's event model which allows you to submit entries to more than one section at a time. Form Controls has been developed in conjunction with EventEx, so they support and complement each other well.
 
 ### Using section handles `articles[...]` instead of `fields[...]`
-The Symphony default is to pass field names in the form `fields[handle]`. EventEx changes this so that `fields` is repaced with the handle of the section into which you are posting. To account for this, each control template has an optional `section` parameter which defaults to `fields`:
+The Symphony default is to pass field names in the form `fields[handle]`. EventEx changes this so that `fields` is replaced with the handle of the section into which you are posting. To account for this, each control template has an optional `section` parameter which defaults to `fields`:
 
 	<xsl:call-template name="form:input">
 		<xsl:with-param name="section" select="'articles'"/>
 		<xsl:with-param name="handle" select="'title'"/>
 	</xsl:call-template>
-	
+
 	<input type="text" name="articles[title]" />
 
 Posting multiple entries is also supported, using a numeric predicate that can be passed in the `section` parameter:
@@ -459,7 +480,7 @@ Posting multiple entries is also supported, using a numeric predicate that can b
 ### Granular validation reporting
 
 EventEx will return an `entry` node in the `<events>` nodeset for each entry it tries to modify. If submitting to multiple sections then it is likely to want to validate fields by section. The `validation-summary` also accepts a `section` parameter so that it will show errors only for one section:
-	
+
 	<xsl:call-template name="form:validation-summary">
 		<xsl:with-param name="section" select="'articles'"/>
 	</xsl:call-template>
