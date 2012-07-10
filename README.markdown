@@ -379,7 +379,7 @@ Renders a collection of HTML checkbox `input` elements wrapped with `label` elem
 
 #### Example
 
-	<xsl:call-template name="form:radiobutton-list">
+	<xsl:call-template name="form:checkbox-list">
 		<xsl:with-param name="handle" select="'country'"/>
 		<xsl:with-param name="options" select="/data/countries/country"/>
 		<xsl:with-param name="value" select="'United Kingdom'"/>
